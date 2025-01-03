@@ -2,10 +2,4 @@ GET http://localhost:8080 HTTP/1.1
     
 ###
     
-
-
-GET http://samplego.test HTTP/1.1
-
-###
-
-GET http://samplego.test/ping HTTP/1.1
+GET http://localhost:8080/ping HTTP/1.1

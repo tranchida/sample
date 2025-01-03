@@ -1,19 +1,15 @@
-FROM golang:1.23.3 AS builder
+#build stage
+FROM golang:alpine AS builder
+RUN apk add --no-cache git
+WORKDIR /go/src/app
+COPY . .
+RUN go get -d -v ./...
+RUN go build -o /go/bin/app -v ./...
 
-WORKDIR /build
-
-COPY go.mod go.sum ./
-
-RUN go mod download
-
-COPY *.go ./
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o goapp
-
+#final stage
 FROM alpine:latest
-
-WORKDIR /app
-
-COPY --from=builder /build/goapp .
-
-CMD ["/app/goapp"]
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /go/bin/app /app
+ENTRYPOINT /app
+LABEL Name=sample Version=0.0.1
+EXPOSE 8000
