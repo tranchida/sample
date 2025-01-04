@@ -1,22 +1,37 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/labstack/echo-contrib/echoprometheus"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
 
 func main() {
 
-	r := gin.Default()
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(echoprometheus.NewMiddleware("myapp"))   // adds middleware to gather metrics
+	e.GET("/metrics", echoprometheus.NewHandler()) // adds route to serve gathered metrics
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
+	type message struct {
+		Message string `json:"message"`
+	}
+
+	e.GET("/", func(c echo.Context) error {
+		m := &message{
+			Message: "Bonjour, tous le monde !",
+		}
+		return c.JSON(http.StatusOK, m)
 	})
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+	e.GET("/ping", func(c echo.Context) error {
+		m := &message{
+			Message: "pong",
+		}
+		return c.JSON(http.StatusOK, m)
 	})
 
-	r.Run()
+	e.Logger.Fatal(e.Start(":8080"))
 }

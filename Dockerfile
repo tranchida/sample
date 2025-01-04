@@ -1,15 +1,12 @@
 #build stage
-FROM golang:alpine AS builder
-RUN apk add --no-cache git
+FROM docker.io/golang:alpine AS builder
 WORKDIR /go/src/app
 COPY . .
-RUN go get -d -v ./...
-RUN go build -o /go/bin/app -v ./...
+RUN go get ./...
+RUN go build -o /go/bin/app ./...
 
 #final stage
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+FROM docker.io/busybox:latest
 COPY --from=builder /go/bin/app /app
-ENTRYPOINT /app
-LABEL Name=sample Version=0.0.1
-EXPOSE 8000
+ENTRYPOINT ["/app"]
+EXPOSE 8080
