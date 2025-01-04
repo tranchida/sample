@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample
+  template:
+    metadata:
+      labels:
+        app: sample
+    spec:
+      containers:
+      - name: sample
+        image: sample:2.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: TZ
+            value: "Europe/Zurich"
+          - name: GIN_MODE
+            value: release
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "0.2"
+          requests:
+            memory: "100Mi"
+            cpu: "0.1"
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          periodSeconds: 10
+            
+          
