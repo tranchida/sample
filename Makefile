@@ -12,3 +12,6 @@ run: build
 
 air:
 	air
+
+docker:
+	docker buildx build -t sample:2.0.0 .
